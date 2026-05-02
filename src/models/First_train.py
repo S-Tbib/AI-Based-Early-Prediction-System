@@ -83,7 +83,6 @@ def get_models():
         'K-Nearest Neighbors': KNeighborsClassifier(n_neighbors=5),
         'Naive Bayes': GaussianNB()
     }
-    
     return models
 
 

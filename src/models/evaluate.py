@@ -136,7 +136,7 @@ def evaluate():
         y_proba = model.predict_proba(X_test)[:, 1]
     else:
         y_proba = None
-    threshold = 0.5  # important pour diabète (plus sensible)
+    threshold = 0.3  # important pour diabète (plus sensible)
     y_pred = (y_proba >= threshold).astype(int)
     # ================= metrics =================
     print("\nClassification Report:")

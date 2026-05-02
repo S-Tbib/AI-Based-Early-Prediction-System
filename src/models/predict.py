@@ -1,6 +1,5 @@
 """
 Prediction module for new data
-Can be used in backend (API / Streamlit)
 """
 
 import pandas as pd
