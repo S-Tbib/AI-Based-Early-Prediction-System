@@ -1,0 +1,39 @@
+# PYTHON
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+
+# VIRTUAL ENV
+venv/
+.env
+__pycache__/
+*.pyc
+
+# JUPYTER
+.ipynb_checkpoints/
+
+# MODEL FILES (IMPORTANT)
+model/
+*.pkl
+*.joblib
+
+
+# ENV VARIABLES
+.env
+
+
+# IDE (VS CODE / PYCHARM)
+.vscode/
+.idea/
+
+# OS FILES
+.DS_Store
+Thumbs.db
+
+# LOGS
+logs/
+*.log

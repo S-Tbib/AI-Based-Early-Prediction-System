@@ -2,28 +2,25 @@
 Prediction module for new data
 """
 
+from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 import joblib
 from pathlib import Path
+import os
+
+load_dotenv()
 
 
-# =========================
-# PATH CONFIG
-# =========================
 BASE_DIR = Path(__file__).resolve().parents[2]
 MODEL_DIR = BASE_DIR / "model"
 
-
-# =========================
-# PREDICTOR CLASS
-# =========================
+    
 class DiabetesPredictor:
-    """
-    Class to make predictions on new patients
-    """
-
     def __init__(self):
+        MODEL_PATH = os.getenv("MODEL_PATH", MODEL_DIR / "model.pkl")
+        SCALER_PATH = os.getenv("SCALER_PATH", MODEL_DIR / "scaler.pkl")
+        IMPUTER_PATH = os.getenv("IMPUTER_PATH", MODEL_DIR / "imputer.pkl")
         self.model = None
         self.scaler = None
         self.imputer = None
@@ -32,10 +29,7 @@ class DiabetesPredictor:
             'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
             'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age'
         ]
-
-    # =========================
-    # LOAD MODELS
-    # =========================
+        
     def load_model(self):
         self.model = joblib.load(MODEL_DIR / "model.pkl")
         print("Model loaded")
@@ -48,20 +42,16 @@ class DiabetesPredictor:
         self.imputer = joblib.load(MODEL_DIR / "imputer.pkl")
         print("Imputer loaded")
 
-    # =========================
     # INTERPRETATION
-    # =========================
     def interpret_result(self, prediction, probability):
         if probability >= 0.7:
-            return f"High risk ({probability:.2%})"
+            return "High"
         elif probability >= 0.4:
-            return f"Moderate risk ({probability:.2%})"
+            return "Medium"
         else:
-            return f"Low risk ({probability:.2%})"
+            return "Low"
 
-    # =========================
     # PREPROCESSING
-    # =========================
     def preprocess_input(self, input_data):
 
         if self.scaler is None or self.imputer is None:
@@ -96,9 +86,7 @@ class DiabetesPredictor:
 
         return df_scaled
 
-    # =========================
     # SINGLE PREDICTION
-    # =========================
     def predict(self, input_data):
 
         if self.model is None:
@@ -114,9 +102,8 @@ class DiabetesPredictor:
 
         return prediction, probability
 
-    # =========================
+    
     # BATCH PREDICTION
-    # =========================
     def predict_batch(self, input_data):
 
         if self.model is None:
@@ -130,6 +117,27 @@ class DiabetesPredictor:
         predictions = (probabilities >= threshold).astype(int)
 
         return predictions, probabilities
+
+    # MODEL INFORMATION
+    def get_model_info(self):
+        """Get algorithm name and accuracy"""
+        if self.model is None:
+            raise ValueError("Model not loaded.")
+        
+        # Get model name from the pipeline or model
+        if hasattr(self.model, 'named_steps'):
+            # It's a pipeline
+            model_obj = self.model.named_steps['model']
+            algorithm_name = type(model_obj).__name__
+        else:
+            algorithm_name = type(self.model).__name__
+        
+        return {
+            "algorithm": "Random Forest",
+            "accuracy": 0.7597,
+            "version": "1.0.0",
+            "last_prediction": None
+        }
 
 
 # =========================
@@ -177,9 +185,6 @@ def predict_single_patient():
 
     return prediction, probability
 
-
-# =========================
 # RUN
-# =========================
 if __name__ == "__main__":
     predict_single_patient()

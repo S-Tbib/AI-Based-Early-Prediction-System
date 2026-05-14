@@ -1,9 +1,4 @@
 
-"""
-Model training module for diabetes prediction
-Improved version: clean pipeline, better evaluation, no leakage, production-ready
-"""
-
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -39,9 +34,6 @@ from sklearn.metrics import (
 import joblib
 
 
-# =============================
-# PATH CONFIG (ROBUST)
-# =============================
 BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data" / "processed"
 MODEL_DIR = BASE_DIR / "model"
@@ -50,10 +42,6 @@ REPORT_DIR = BASE_DIR / "reports" / "figures"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-
-# =============================
-# LOAD DATA
-# =============================
 def load_processed_data():
     train_df = pd.read_csv(DATA_DIR / "train.csv")
     test_df = pd.read_csv(DATA_DIR / "test.csv")
@@ -83,7 +71,7 @@ def get_models():
 
         "Random Forest": RandomForestClassifier(
             n_estimators=200,
-            max_depth=8,
+            max_depth=7,
             min_samples_split=5,
             min_samples_leaf=2,
             random_state=42,

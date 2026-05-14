@@ -1,23 +1,36 @@
 import sys
 import os
 
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(BASE_DIR)
 
 from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+load_dotenv()
+MODEL_PATH = os.getenv("MODEL_PATH")
+SCALER_PATH = os.getenv("SCALER_PATH")
+IMPUTER_PATH = os.getenv("IMPUTER_PATH")
+
 from pydantic import BaseModel
 from models.predict import DiabetesPredictor
+from fastapi.middleware.cors import CORSMiddleware
 
-
-# =========================
-# INIT APP
-# =========================
 app = FastAPI(
     title="AI Diabetes Prediction API",
     description="API for diabetes risk prediction",
     version="1.0.0"
 )
 
+# CORS MUST be after app creation
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 print("API started successfully")
 
 
@@ -81,3 +94,17 @@ def health_check():
         "status": "healthy",
         "model_loaded": predictor.model is not None
     }
+
+
+@app.get("/model-info")
+def get_model_info():
+    """Get detailed model information including feature importances"""
+    try:
+        model_info = predictor.get_model_info()
+        return {
+            "status": "success",
+            "model_info": model_info
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
